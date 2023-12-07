@@ -33,19 +33,32 @@ import edu.harvard.hms.dbmi.avillach.hpds.data.phenotype.PhenoCube;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class SequentialLoader {
 
-	private static final String INPUT_DIR =  "/opt/local/hpds_input/";
+	private String INPUT_DIR;
+	private long LOG_INTERVAL;
+	private SequentialLoadingStore store;
+	private static Logger log = LoggerFactory.getLogger(SequentialLoader.class);
+	private JdbcTemplate template;
+	private long processedRecords;
 
-	private static final long LOG_INTERVAL = 1000000;
-
-	private static SequentialLoadingStore store = new SequentialLoadingStore();
-
-	private static Logger log = LoggerFactory.getLogger(SequentialLoader.class); 
-
-	private static JdbcTemplate template = null;
+	public SequentialLoader (String input_dir, long log_interval) {
+		if (input_dir == null) {
+			input_dir = "/opt/local/hpds_input/";
+		}
 	
-	private static long processedRecords = 0;
+		if (Objects.isNull(log_interval)) {
+			log_interval = 1000000;
+		}
+
+		INPUT_DIR = input_dir;
+		LOG_INTERVAL = log_interval;
+		store = new SequentialLoadingStore();
+		template = null;
+		processedRecords = 0;
+	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+		SequentialLoader loader = new SequentialLoader("/opt/local/hpds_input/", 1000000);
 		
 		Crypto.loadDefaultKey();
 		
@@ -54,7 +67,7 @@ public class SequentialLoader {
 		if(args.length > 0) {
 			inputFiles.addAll(Arrays.asList(args));
 		} else {
-			inputFiles.addAll(readFileList());
+			inputFiles.addAll(loader.readFileList());
 		}
 		
 		if(inputFiles.size() == 0) {
@@ -76,28 +89,28 @@ public class SequentialLoader {
 		for(String filename : inputFiles) {
 			log.info("Loading file " + filename);
 			if(filename.toLowerCase().endsWith("sql")) {
-				loadSqlFile(filename);
+				loader.loadSqlFile(filename);
 			} else if(filename.toLowerCase().endsWith("csv")){
-				loadCsvFile(filename);
+				loader.loadCsvFile(filename);
 			}
 		}
 		
 		//then complete, which will compact, sort, and write out the data in the final place
-		log.info("found a total of " + processedRecords + " entries");
-		store.saveStore();
-		store.dumpStats();
+		log.info("found a total of " + loader.processedRecords + " entries");
+		loader.store.saveStore();
+		loader.store.dumpStats();
 	}
 
-	private static List<? extends String> readFileList() throws IOException {
+	public List<? extends String> readFileList() throws IOException {
 		List<String> inputFiles = new ArrayList<String>();
-        Files.list(new File(INPUT_DIR).toPath())
-                .forEach(path -> {
-                    inputFiles.add(INPUT_DIR + path.getFileName().toString());
-                });
+		Files.list(new File(this.INPUT_DIR).toPath())
+				.forEach(path -> {
+					inputFiles.add(this.INPUT_DIR + path.getFileName().toString());
+				});
 		return inputFiles;
 	}
 
-	private static void loadCsvFile(String filename) throws IOException {
+	public void loadCsvFile(String filename) throws IOException {
 		
 		Reader in = new FileReader(filename);
 		BufferedReader reader = new BufferedReader(in, 1024*1024);
@@ -117,7 +130,7 @@ public class SequentialLoader {
 		in.close();
 	}
 	
-	private static void loadSqlFile(String filename) throws FileNotFoundException, IOException {
+	public void loadSqlFile(String filename) throws FileNotFoundException, IOException {
 		loadTemplate();
 		String loadQuery = IOUtils.toString(new FileInputStream(filename), Charset.forName("UTF-8"));
 		
@@ -132,16 +145,16 @@ public class SequentialLoader {
 	}
 
 	
-	private static void loadTemplate() throws FileNotFoundException, IOException {
+	public void loadTemplate() throws FileNotFoundException, IOException {
 		if (template == null) {
 			Properties props = new Properties();
-			props.load(new FileInputStream(INPUT_DIR + "sql.properties"));
+			props.load(new FileInputStream(this.INPUT_DIR + "sql.properties"));
 			template = new JdbcTemplate(new DriverManagerDataSource(props.getProperty("datasource.url"), props.getProperty("datasource.user"),
 					props.getProperty("datasource.password")));
 		}
 	}
 
-	private static void processRecord(final PhenoCube[] currentConcept, PhenoRecord record) {
+	public void processRecord(final PhenoCube[] currentConcept, PhenoRecord record) {
 		if(record == null ) {
 			return;
 		}
