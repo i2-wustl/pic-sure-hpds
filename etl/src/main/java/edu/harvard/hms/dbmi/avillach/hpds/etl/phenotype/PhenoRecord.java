@@ -84,4 +84,22 @@ public class PhenoRecord {
 		patientNum = Integer.parseInt(record.get(PATIENT_NUM_COL));
 		textValue =record.get(TEXT_VALUE_COL) == null ? null : record.get(TEXT_VALUE_COL).trim();
 	}
+
+	//API constructor
+	public PhenoRecord (int patientNumber, String concept, String numericVal, String textVal, Date timestamp) {
+		patientNum = patientNumber;
+		conceptPath = concept;
+		numericValue = numericVal;
+		textValue = textVal;
+		dateTime = timestamp;
+	}
+
+	// alternative API constructor -- use setter to adjust afterwards
+	public PhenoRecord () {
+		patientNum = 0;
+		conceptPath = null;
+		numericValue = null;
+		textValue = null;
+		dateTime = new Date(0);
+	}
 }
