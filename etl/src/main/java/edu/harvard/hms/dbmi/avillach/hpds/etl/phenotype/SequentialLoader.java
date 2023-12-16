@@ -51,7 +51,7 @@ public class SequentialLoader {
 
 		INPUT_DIR = input_dir;
 		LOG_INTERVAL = log_interval;
-		store = new SequentialLoadingStore();
+		store = new SequentialLoadingStore(input_dir);
 		template = null;
 		processedRecords = 0;
 	}

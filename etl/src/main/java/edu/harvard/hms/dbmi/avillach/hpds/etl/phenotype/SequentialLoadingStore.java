@@ -29,9 +29,9 @@ import edu.harvard.hms.dbmi.avillach.hpds.data.phenotype.PhenoCube;
  */
 public class SequentialLoadingStore {
  
-	private static final String COLUMNMETA_FILENAME = "/opt/local/hpds/columnMeta.javabin";
-	protected static final String OBSERVATIONS_FILENAME = "/opt/local/hpds/allObservationsStore.javabin";
-	protected static final String OBS_TEMP_FILENAME = "/opt/local/hpds/allObservationsTemp.javabin";
+	private String COLUMNMETA_FILENAME;
+	protected String OBSERVATIONS_FILENAME;
+	protected String OBS_TEMP_FILENAME;
 	
 	public RandomAccessFile allObservationsStore;
 	public RandomAccessFile allObservationsTemp;
@@ -39,14 +39,28 @@ public class SequentialLoadingStore {
 	TreeMap<String, ColumnMeta> metadataMap = new TreeMap<>();
 	
 	private static Logger log = LoggerFactory.getLogger(SequentialLoadingStore.class);
+
+    public SequentialLoadingStore(String root_path) {
+        COLUMNMETA_FILENAME = String.format("%s/%s", root_path, "columnMeta.javabin");
+        OBSERVATIONS_FILENAME = String.format("%s/%s", root_path, "allObservationsStore.javabin");
+        OBS_TEMP_FILENAME = String.format("%s/%s", root_path, "allObservationsTemp.javabin");
+        this.initialize();
+    }
 	
 	public SequentialLoadingStore() {
+        COLUMNMETA_FILENAME = "/opt/local/hpds/columnMeta.javabin";
+        OBSERVATIONS_FILENAME = "/opt/local/hpds/allObservationsStore.javabin";
+        OBS_TEMP_FILENAME = "/opt/local/hpds/allObservationsTemp.javabin";
+        this.initialize();
+	}
+
+    public void initialize() {
 		try {
 			allObservationsTemp = new RandomAccessFile(OBS_TEMP_FILENAME, "rw");
 		} catch (FileNotFoundException e) {
 			throw new UncheckedIOException(e);
 		}
-	}
+    }
 	
 	public LoadingCache<String, PhenoCube> loadingCache = CacheBuilder.newBuilder()
 			.maximumSize(16)
