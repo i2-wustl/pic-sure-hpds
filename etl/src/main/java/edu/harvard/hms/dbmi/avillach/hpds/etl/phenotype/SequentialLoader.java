@@ -42,7 +42,7 @@ public class SequentialLoader {
 
 	public SequentialLoader (String input_dir, long log_interval) {
 		if (input_dir == null) {
-			input_dir = "/opt/local/hpds_input/";
+			input_dir = "/opt/local/hpds_input";
 		}
 	
 		if (Objects.isNull(log_interval)) {
