@@ -40,6 +40,10 @@ public class SequentialLoader {
 	private JdbcTemplate template;
 	private long processedRecords;
 
+	public SequentialLoadingStore getLoadingStore() {
+		return store;
+	}
+
 	public SequentialLoader (String input_dir, long log_interval) {
 		if (input_dir == null) {
 			input_dir = "/opt/local/hpds_input";
