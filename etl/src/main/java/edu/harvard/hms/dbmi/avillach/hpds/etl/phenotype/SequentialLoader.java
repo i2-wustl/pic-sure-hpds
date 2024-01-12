@@ -213,4 +213,56 @@ public class SequentialLoader {
 			log.error("Error processing record", e);
 		}
 	}
+
+	public void processRecord2(final PhenoCube[] currentConcept, PhenoRecord record) {
+		if(record == null ) {
+			return;
+		}
+
+		try {
+			String conceptPathFromRow = record.getConceptPath();
+			String[] segments = conceptPathFromRow.split("\\\\");
+			for(int x = 0;x<segments.length;x++) {
+				segments[x] = segments[x].trim();
+			}
+			conceptPathFromRow = String.join("\\", segments) + "\\";
+			conceptPathFromRow = conceptPathFromRow.replaceAll("\\ufffd", "");
+			String textValueFromRow = record.getTextValue();
+			if(textValueFromRow!=null) {
+				textValueFromRow = textValueFromRow.replaceAll("\\ufffd", "");
+			}
+			String conceptPath = conceptPathFromRow.endsWith("\\" +textValueFromRow+"\\") ? conceptPathFromRow.replaceAll("\\\\[^\\\\]*\\\\$", "\\\\") : conceptPathFromRow;
+			// This is not getDouble because we need to handle null values, not coerce them into 0s
+			String numericValue = record.getNumericValue();
+			if((numericValue==null || numericValue.isEmpty()) && textValueFromRow!=null) {
+				try {
+					numericValue = Double.parseDouble(textValueFromRow) + "";
+				}catch(NumberFormatException e) {
+
+				}
+			}
+			boolean isAlpha = (numericValue == null || numericValue.isEmpty());
+			if(currentConcept[0] == null || !currentConcept[0].name.equals(conceptPath)) {
+				log.debug("New concept " + record.getConceptPath());
+				currentConcept[0] = new PhenoCube(conceptPath, isAlpha ? String.class : Double.class);
+				store.loadingCache.put(conceptPath, currentConcept[0]);
+			}
+			String value = isAlpha ? record.getTextValue() : numericValue;
+
+			if(value != null && !value.trim().isEmpty() && ((isAlpha && currentConcept[0].vType == String.class)||(!isAlpha && currentConcept[0].vType == Double.class))) {
+				value = value.trim();
+				currentConcept[0].setColumnWidth(isAlpha ? Math.max(currentConcept[0].getColumnWidth(), value.getBytes().length) : Double.BYTES);
+				int patientId = record.getPatientNum();
+				
+				currentConcept[0].add(patientId, isAlpha ? value : Double.parseDouble(value), record.getDateTime());
+				store.allIds.add(patientId);
+			}
+			if(++processedRecords  % LOG_INTERVAL == 0) {
+				log.info("Loaded " + processedRecords + " records");
+			}
+		} catch (Exception e) {
+			// todo: do we really want to ignore this?
+			log.error("Error processing record", e);
+		}
+	}
 }
