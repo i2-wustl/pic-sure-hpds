@@ -231,7 +231,7 @@ public class SequentialLoader {
 			if(textValueFromRow!=null) {
 				textValueFromRow = textValueFromRow.replaceAll("\\ufffd", "");
 			}
-			String conceptPath = conceptPathFromRow.endsWith("\\" +textValueFromRow+"\\") ? conceptPathFromRow.replaceAll("\\\\[^\\\\]*\\\\$", "\\\\") : conceptPathFromRow;
+			String conceptPath = conceptPathFromRow;
 			// This is not getDouble because we need to handle null values, not coerce them into 0s
 			String numericValue = record.getNumericValue();
 			if((numericValue==null || numericValue.isEmpty()) && textValueFromRow!=null) {
