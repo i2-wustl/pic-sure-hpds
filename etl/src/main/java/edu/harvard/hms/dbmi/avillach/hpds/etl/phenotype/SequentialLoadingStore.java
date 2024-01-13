@@ -99,6 +99,12 @@ public class SequentialLoadingStore {
 					});
 
 	public TreeSet<Integer> allIds = new TreeSet<Integer>();
+
+	public void flushTempStore() throws IOException {
+		log.info("flushing temp storage");
+		loadingCache.invalidateAll();
+		loadingCache.cleanUp();
+	}
 	
 	public void saveStore() throws FileNotFoundException, IOException, ClassNotFoundException {
 		log.info("flushing temp storage");
