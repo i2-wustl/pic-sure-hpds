@@ -78,6 +78,7 @@ public class SequentialLoadingStore {
 							
 							allObservationsTemp.write(byteStream.toByteArray());
 							columnMeta.setAllObservationsLength(allObservationsTemp.getFilePointer());
+							log.debug("Putting [ " + columnMeta.getName() + " ] columnMeta into metadataMap");
 							metadataMap.put(columnMeta.getName(), columnMeta);
 						} catch (IOException e1) {
 							throw new UncheckedIOException(e1);
