@@ -251,7 +251,7 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 			if (!this.name.equals(conceptPath)) {
 			    String msg = "Skipping PhenoInput record with concept path: %s.  " +
 			                 "This PhenoCube object only processes records with concept: %s";
-			    log.info(String.format(msg, conceptPath, this.name))
+			    log.info(String.format(msg, conceptPath, this.name));
 			    return;
 			}
 			
