@@ -27,10 +27,17 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 		this.name = name;
 	}
 
-    public PhenoCube(String name, boolean isAlpha) {
-        this.vType = isAlpha ? String.class : Double.class;
-        this.name = name;
-    }
+//	public PhenoCube(String name, boolean isAlpha) {
+//		this(name, isAlpha ? String.class : Double.class);
+//	}
+
+// 	public PhenoCube(String name, boolean isAlpha) {
+// 		if (isAlpha) {
+// 		    this.<String>Phen(name, String.class);
+// 		} else {
+// 		    this(name, Double.class);
+// 		}
+// 	}
 
 	public void add(Integer key, V value, Date date) {
 		loadingMap.add(new KeyAndValue<V>(key, value, date!=null?date.getTime():null));
