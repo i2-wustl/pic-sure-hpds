@@ -33,9 +33,9 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 
 // 	public PhenoCube(String name, boolean isAlpha) {
 // 		if (isAlpha) {
-// 		    this.<String>Phen(name, String.class);
+// 		    this.<Class<?>>PhenoCube(name, String.class);
 // 		} else {
-// 		    this(name, Double.class);
+// 		    this.<Class<?>>PhenoCube(name, Double.class);
 // 		}
 // 	}
 
