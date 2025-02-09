@@ -68,12 +68,14 @@ public class PhenoInput {
 
 	public String sanitizeConceptPath() {
 		String cp = getConceptPath();
+		String tv = sanitizeTextValue();
 		String[] segments = cp.split("\\\\");
 		for(int x = 0; x<segments.length; x++) {
 			segments[x] = segments[x].trim();
 		}
 		String trimmedConceptPath = String.join("\\", segments) + "\\";
-		String sanitizedConceptPath = trimmedConceptPath.replaceAll("\\ufffd", "");
+		String cleanCP = trimmedConceptPath.replaceAll("\\ufffd", "");
+		String sanitizedConceptPath = cleanCP.endsWith("\\" + cleanCP + "\\") ? cleanCP.replaceAll("\\\\[^\\\\]*\\\\$", "\\\\") : cleanCP;
 		return sanitizedConceptPath;
 	}
 
