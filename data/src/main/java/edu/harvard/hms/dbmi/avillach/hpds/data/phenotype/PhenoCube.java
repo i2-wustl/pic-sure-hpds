@@ -27,6 +27,11 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 		this.name = name;
 	}
 
+    public PhenoCube(String name, boolean isAlpha) {
+        this.vType = isAlpha ? String.class : Double.class;
+        this.name = name;
+    }
+
 	public void add(Integer key, V value, Date date) {
 		loadingMap.add(new KeyAndValue<V>(key, value, date!=null?date.getTime():null));
 	}
@@ -232,4 +237,44 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 		return values;
 	}
 
+	public void addPhenoInput(PhenoInput record) {
+		if(record == null ) {
+			return;
+		}
+		
+		try {
+			String conceptPath = record.sanitizeConceptPath();
+			String textValueFromRow = record.sanitizeTextValue();
+			String numericValue = record.sanitizeNumericValue();
+			boolean isAlpha = record.isAlpha();
+			
+			if (!this.name.equals(conceptPath)) {
+			    String msg = "Skipping PhenoInput record with concept path: %s.  " +
+			                 "This PhenoCube object only processes records with concept: %s";
+			    log.info(String.format(msg, conceptPath, this.name))
+			    return;
+			}
+			
+			String value = isAlpha ? textValueFromRow : numericValue;
+			
+			if(value != null
+					&& !value.trim().isEmpty()
+					&& ((isAlpha && this.vType == String.class)
+						 || (!isAlpha && this.vType == Double.class))) {
+				value = value.trim();
+				currentConcept[0].setColumnWidth(isAlpha ? Math.max(this.getColumnWidth(), value.getBytes().length) : Double.BYTES);
+				int patientId = record.getPatientNum();
+				
+				this.add(patientId, isAlpha ? value : Double.parseDouble(value), record.getDateTime());
+			}
+			
+		} catch (Exception e) {
+			// todo: do we really want to ignore this?
+			log.error("Error processing record", e);
+		}
+	}
+
+	public int numRecords() {
+		int length = loadingMap.size();
+	}
 }
