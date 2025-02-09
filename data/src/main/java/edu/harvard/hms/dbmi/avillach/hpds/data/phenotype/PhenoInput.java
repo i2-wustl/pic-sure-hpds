@@ -72,13 +72,13 @@ public class PhenoInput {
 		for(int x = 0; x<segments.length; x++) {
 			segments[x] = segments[x].trim();
 		}
-		trimmedConceptPath = String.join("\\", segments) + "\\";
-		sanitizedConceptPath = trimmedConceptPath.replaceAll("\\ufffd", "");
+		String trimmedConceptPath = String.join("\\", segments) + "\\";
+		String sanitizedConceptPath = trimmedConceptPath.replaceAll("\\ufffd", "");
 		return sanitizedConceptPath;
 	}
 
 	public String sanitizeTextValue() {
-		sanitizedTextValue = null;
+		String sanitizedTextValue = null;
 		String tv = getTextValue();
 		if(tv != null) {
 			sanitizedTextValue = tv.replaceAll("\\ufffd", "");
@@ -90,7 +90,7 @@ public class PhenoInput {
 		// This is not getDouble because we need to handle null values, not coerce them into 0s
 		String numericValue = getNumericValue();
 		if(numericValue == null || numericValue.isEmpty()) {
-			tv = sanitizeTextValue();
+			String tv = sanitizeTextValue();
 			if (tv != null) {
 				try {
 					numericValue = Double.parseDouble(tv) + "";
