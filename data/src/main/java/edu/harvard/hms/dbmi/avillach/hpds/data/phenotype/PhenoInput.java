@@ -75,7 +75,7 @@ public class PhenoInput {
 		}
 		String trimmedConceptPath = String.join("\\", segments) + "\\";
 		String cleanCP = trimmedConceptPath.replaceAll("\\ufffd", "");
-		String sanitizedConceptPath = cleanCP.endsWith("\\" + cleanCP + "\\") ? cleanCP.replaceAll("\\\\[^\\\\]*\\\\$", "\\\\") : cleanCP;
+		String sanitizedConceptPath = cleanCP.endsWith("\\" + tv + "\\") ? cleanCP.replaceAll("\\\\[^\\\\]*\\\\$", "\\\\") : cleanCP;
 		return sanitizedConceptPath;
 	}
 
