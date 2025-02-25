@@ -287,4 +287,13 @@ public class PhenoCube<V extends Comparable<V>> implements Serializable {
 		int length = loadingMap.size();
 		return length;
 	}
+
+    public boolean isAlpha() {
+        if (vType == String.class) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
